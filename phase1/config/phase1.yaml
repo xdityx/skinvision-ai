@@ -1,0 +1,40 @@
+# phase1/config/phase1.yaml
+# All Phase 1 hyperparameters — single source of truth.
+# Tuned for: NVIDIA RTX 3050 4 GB VRAM, i5-12500H, 16 GB RAM.
+
+project:
+  name: "acne04-phase1"
+  seed: 42
+
+# ─── Model ───────────────────────────────────────────────────────────────────
+model:
+  backbone: "efficientnet_b2"   # timm model name
+  pretrained: true
+  num_classes: 3                # mild / moderate / severe
+  dropout: 0.3
+
+# ─── Training ────────────────────────────────────────────────────────────────
+training:
+  epochs: 50
+  batch_size: 16                # safe for 4 GB VRAM at 260 px with FP16
+  grad_accum_steps: 2           # effective batch = 32
+  num_workers: 2                # Windows-safe (avoid spawn issues)
+  pin_memory: true              # faster CPU→GPU transfers
+  learning_rate: 3.0e-4
+  weight_decay: 1.0e-4
+  warmup_epochs: 3
+  patience: 10                  # early stopping on val macro-F1
+  mixed_precision: true         # FP16; auto-disabled when no CUDA
+  label_smoothing: 0.05         # slight smoothing for CORN binary tasks
+  seed: 42
+  checkpoint_dir: "phase1/checkpoints"
+  log_dir: "phase1/logs"
+
+# ─── Data ────────────────────────────────────────────────────────────────────
+data:
+  splits_dir: "data/phase0_outputs/splits"
+  image_size: 260               # EfficientNet-B2 native resolution
+  severity_map:
+    0: "mild"
+    1: "moderate"
+    2: "severe"

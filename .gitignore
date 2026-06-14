@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb~
+
+# Data — never commit raw images or large outputs
+data/raw/
+data/phase0_outputs/
+
+# Model weights
+models/
+*.pt
+*.onnx
+*.npy
+
+# Secrets
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports figures (large PNGs — commit only final reports)
+reports/phase0/figures/
+
+# InsightFace model cache
+~/.insightface/
+
+# Logs / runtime outputs
+logs/
+*.log
+phase1/logs/
+
+# Test/cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local model caches
+.insightface/

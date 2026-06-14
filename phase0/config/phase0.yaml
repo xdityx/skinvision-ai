@@ -1,0 +1,85 @@
+# phase0/config/phase0.yaml
+# Single source of truth for all Phase 0 configuration.
+# No paths or thresholds are hardcoded in source files.
+
+project:
+  seed: 42
+  name: "acne04-phase0"
+
+paths:
+  # Relative to project root (skincare-ai/)
+  data_root:    "data/raw/ACNE04"
+  outputs_root: "data/phase0_outputs"
+  reports_root: "reports/phase0"
+  figures_dir:  "reports/phase0/figures"
+
+ingestion:
+  format: "auto"          # "auto" | "folder" | "coco"
+  # Folder-structure format (Kaggle ACNE04 distribution)
+  class_folders:
+    - "acne0_1024"
+    - "acne1_1024"
+    - "acne2_1024"
+    - "acne3_1024"
+  label_mapping:
+    0: 0
+    1: 1
+    2: 2
+    3: 2
+  severity_map:           # target label → clinical severity name
+    0: "mild"
+    1: "moderate"
+    2: "severe"
+  all_folder: "all_1024"
+  sim_csv:    "sim_acne.csv"
+  # COCO-style format (future use)
+  coco_json_filename: "Acne04-v2_annotations.json"
+  supported_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".webp"
+
+eda:
+  sample_grid_rows: 6
+  sample_grid_cols: 4
+  sample_grid_seed: 42
+
+quality:
+  blur_threshold:          0.0     # Laplacian variance; below = blurry
+  underexposed_threshold:   40.0   # Mean pixel intensity; below = dark
+  overexposed_threshold:   215.0   # Mean pixel intensity; above = washed out
+  low_contrast_threshold:   20.0   # Std dev; below = low contrast
+  face_confidence_threshold: 0.7   # MediaPipe min confidence
+  face_model_selection: 0          # 0=short-range (selfie), 1=full-range (clinical)
+  min_image_dimension: 224         # Flag images below this as TOO_SMALL
+
+clustering:
+  embedding_model: "buffalo_sc"    # InsightFace model name
+  embedding_cache: true            # Skip extraction if .npy already exists
+  face_image_size: 112             # InsightFace standard input size
+  det_size: [320, 320]             # Detection size for InsightFace. Smaller sizes (e.g. 320x320) work much better for close-up face crops.
+  dbscan_eps_sweep:
+    - 0.30
+    - 0.35
+    - 0.40
+    - 0.45
+    - 0.50
+  dbscan_min_samples: 2
+  tsne_perplexity: 30
+  tsne_seed: 42
+  dendrogram_max_samples: 200      # Subsample for dendrogram if dataset is large
+
+splits:
+  train_ratio: 0.70
+  val_ratio:   0.15
+  test_ratio:  0.15
+  distribution_tolerance_pct: 5.0  # Max allowed deviation from target %
+  seed: 42
+
+report:
+  thresholds:
+    min_images_per_class:      100
+    max_imbalance_ratio:        10.0
+    max_corrupted_pct:          10.0
+    max_leakage_risk_index:      5.0
