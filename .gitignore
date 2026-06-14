@@ -60,3 +60,15 @@ htmlcov/
 
 # Local model caches
 .insightface/
+
+acne_1024/
+sim_acne.csv
+data/raw/
+data/phase0_outputs/
+phase1/checkpoints/
+phase1/logs/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.npy
