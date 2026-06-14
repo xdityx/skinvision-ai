@@ -55,6 +55,18 @@ const metaTta         = document.getElementById('meta-tta');
 const metaModel       = document.getElementById('meta-model');
 const modelVersionBadge = document.getElementById('model-version-badge');
 
+const ingredientGuidanceSection = document.getElementById('ingredient-guidance-section');
+const ingredientGrid = document.getElementById('ingredient-grid');
+const routineGrid = document.getElementById('routine-grid');
+const guidanceDisclaimer = document.getElementById('guidance-disclaimer');
+const guidanceCautionBanner = document.getElementById('guidance-caution-banner');
+const guidanceCautions = document.getElementById('guidance-cautions');
+const dermatologistBanner = document.getElementById('dermatologist-banner');
+const dermatologistLevel = document.getElementById('dermatologist-level');
+const dermatologistMessage = document.getElementById('dermatologist-message');
+const confidenceWarningBanner = document.getElementById('confidence-warning-banner');
+const confidenceWarningMessage = document.getElementById('confidence-warning-message');
+
 // ── State ─────────────────────────────────────────────────────────
 let selectedFile = null;
 
@@ -164,6 +176,7 @@ function showEmptyState() {
   skeletonState.hidden = true;
   resultContent.hidden = true;
   hideFaceWarning();
+  clearIngredientGuidance();
 }
 
 function showSkeleton() {
@@ -215,12 +228,143 @@ function showResult(data) {
   metaTime.textContent  = `${data.inference_time_ms.toFixed(0)} ms`;
   metaTta.textContent   = data.tta_enabled ? `Yes (${data.tta_views} views)` : 'No';
   metaModel.textContent = data.model_version;
+
+  renderIngredientGuidance(data.ingredient_guidance);
 }
 
 function setBar(cls, prob) {
   const pct = (prob * 100).toFixed(1);
   document.getElementById(`fill-${cls}`).style.width = `${prob * 100}%`;
   document.getElementById(`pct-${cls}`).textContent   = `${pct}%`;
+}
+
+function renderIngredientGuidance(guidance) {
+  clearIngredientGuidance();
+
+  if (!guidance) {
+    ingredientGuidanceSection.hidden = true;
+    return;
+  }
+
+  ingredientGuidanceSection.hidden = false;
+  guidanceDisclaimer.textContent = guidance.disclaimer || '';
+
+  renderIngredientCards(guidance.recommended_ingredients || []);
+  renderRoutineGuidance(guidance.routine_guidance || {});
+  renderCautions(guidance.cautions || []);
+  renderDermatologistEscalation(guidance.dermatologist_escalation);
+  renderConfidenceWarning(guidance.confidence_warning);
+}
+
+function clearIngredientGuidance() {
+  ingredientGrid.replaceChildren();
+  routineGrid.replaceChildren();
+  guidanceCautions.replaceChildren();
+  guidanceDisclaimer.textContent = '';
+  dermatologistLevel.textContent = '';
+  dermatologistMessage.textContent = '';
+  confidenceWarningMessage.textContent = '';
+  guidanceCautionBanner.hidden = true;
+  dermatologistBanner.hidden = true;
+  confidenceWarningBanner.hidden = true;
+}
+
+function renderIngredientCards(ingredients) {
+  ingredients.forEach((ingredient) => {
+    const card = document.createElement('article');
+    card.className = `ingredient-card priority-${ingredient.priority || 'supportive'}`;
+
+    const header = document.createElement('div');
+    header.className = 'ingredient-card-header';
+
+    const title = document.createElement('h4');
+    title.textContent = ingredient.name;
+
+    const badge = document.createElement('span');
+    badge.className = 'ingredient-priority';
+    badge.textContent = ingredient.priority || 'supportive';
+
+    header.append(title, badge);
+
+    const why = document.createElement('p');
+    why.className = 'ingredient-why';
+    why.textContent = ingredient.why;
+
+    card.append(header, why);
+
+    if (ingredient.cautions && ingredient.cautions.length) {
+      const list = document.createElement('ul');
+      list.className = 'ingredient-cautions';
+      ingredient.cautions.forEach((caution) => {
+        const item = document.createElement('li');
+        item.textContent = caution;
+        list.appendChild(item);
+      });
+      card.appendChild(list);
+    }
+
+    ingredientGrid.appendChild(card);
+  });
+}
+
+function renderRoutineGuidance(routine) {
+  [
+    ['Morning', routine.morning || []],
+    ['Evening', routine.evening || []],
+    ['General', routine.general || []],
+  ].forEach(([label, steps]) => {
+    const panel = document.createElement('section');
+    panel.className = 'routine-panel';
+
+    const title = document.createElement('h4');
+    title.textContent = label;
+
+    const list = document.createElement('ul');
+    steps.forEach((step) => {
+      const item = document.createElement('li');
+      item.textContent = step;
+      list.appendChild(item);
+    });
+
+    panel.append(title, list);
+    routineGrid.appendChild(panel);
+  });
+}
+
+function renderCautions(cautions) {
+  if (!cautions.length) {
+    guidanceCautionBanner.hidden = true;
+    return;
+  }
+
+  cautions.forEach((caution) => {
+    const item = document.createElement('li');
+    item.textContent = caution;
+    guidanceCautions.appendChild(item);
+  });
+  guidanceCautionBanner.hidden = false;
+}
+
+function renderDermatologistEscalation(escalation) {
+  if (!escalation) {
+    dermatologistBanner.hidden = true;
+    return;
+  }
+
+  dermatologistBanner.className = `guidance-banner dermatologist-banner ${escalation.level || ''}`;
+  dermatologistLevel.textContent = (escalation.level || 'guidance').replace(/_/g, ' ');
+  dermatologistMessage.textContent = escalation.message || '';
+  dermatologistBanner.hidden = false;
+}
+
+function renderConfidenceWarning(message) {
+  if (!message) {
+    confidenceWarningBanner.hidden = true;
+    return;
+  }
+
+  confidenceWarningMessage.textContent = message;
+  confidenceWarningBanner.hidden = false;
 }
 
 // ── Error helpers ─────────────────────────────────────────────────

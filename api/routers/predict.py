@@ -36,6 +36,7 @@ from api.config import settings
 from api.dependencies import get_face_validator, get_predictor
 from api.face_validator import FaceNotDetectedError, FaceValidator, MultipleFacesError
 from api.models import ClassProbabilities, ErrorDetail, PredictionResponse
+from api.recommendations import build_ingredient_guidance
 from phase1.src.inference import AcnePredictor, ImageLoadError, ImageTooSmallError
 
 logger = logging.getLogger(__name__)
@@ -226,6 +227,10 @@ async def predict(
 
     # ── 7. Build response (no internal paths) ────────────────────────────────
     probs = raw["class_probabilities"]
+    ingredient_guidance = build_ingredient_guidance(
+        severity=raw["predicted_severity"],
+        confidence=raw["confidence"],
+    )
     return PredictionResponse(
         predicted_class=raw["predicted_class"],
         predicted_severity=raw["predicted_severity"],
@@ -241,4 +246,5 @@ async def predict(
         face_warning=face_warning,
         inference_time_ms=raw["inference_time_ms"],
         model_version=settings.model_version,
+        ingredient_guidance=ingredient_guidance,
     )

@@ -1,0 +1,175 @@
+schema_version: acne_ingredients.v1
+last_reviewed: "2026-06-14"
+disclaimer: "Educational ingredient guidance only. This is not a diagnosis, prescription, or substitute for care from a qualified dermatologist."
+
+ingredients:
+  salicylic_acid:
+    name: Salicylic acid
+    category: exfoliating_acid
+    priority: core
+    why: Helps loosen dead skin cells and oil inside pores, which may support blackhead, whitehead, and clogged-pore care.
+    cautions:
+      - Can cause dryness, stinging, peeling, or irritation, especially when combined with other exfoliating ingredients.
+      - Introduce gradually and pause if significant irritation occurs.
+
+  benzoyl_peroxide:
+    name: Benzoyl peroxide
+    category: antibacterial_anti_inflammatory
+    priority: core
+    why: Helps reduce acne-associated bacteria and inflammation, making it useful for red or inflamed breakouts.
+    cautions:
+      - Can cause dryness, redness, peeling, irritation, and fabric bleaching.
+      - Start gradually and avoid layering with too many irritating actives at once.
+
+  azelaic_acid:
+    name: Azelaic acid
+    category: anti_inflammatory
+    priority: supportive
+    why: Supports inflamed or uneven-looking acne-prone skin and may help with the appearance of post-acne marks.
+    cautions:
+      - May cause tingling, dryness, or mild irritation when first introduced.
+      - Sensitive skin may need less frequent use.
+
+  niacinamide:
+    name: Niacinamide
+    category: barrier_support
+    priority: supportive
+    why: Helps support the skin barrier and may reduce the look of redness and excess oiliness.
+    cautions:
+      - Usually well tolerated, but some people may notice flushing or irritation.
+
+  adapalene_or_retinoid:
+    name: Adapalene or topical retinoid
+    category: retinoid
+    priority: core
+    why: Helps prevent clogged pores and supports cell turnover, which can be useful for persistent comedonal and inflammatory acne.
+    cautions:
+      - Can cause irritation, dryness, peeling, and redness during early use.
+      - Can increase sun sensitivity, so daily broad-spectrum sunscreen is important.
+      - Avoid during pregnancy or when planning pregnancy unless a clinician says it is appropriate.
+      - Introduce slowly and avoid combining with several strong actives at the same time.
+
+  barrier_support:
+    name: Barrier-supporting moisturizer
+    category: skin_barrier
+    priority: supportive
+    why: Helps reduce dryness and irritation from acne actives so the routine is easier to tolerate.
+    cautions:
+      - Choose non-comedogenic, fragrance-free options when possible.
+
+  broad_spectrum_sunscreen:
+    name: Broad-spectrum sunscreen
+    category: photoprotection
+    priority: supportive
+    why: Helps protect acne-prone skin from UV exposure and can reduce the chance that post-acne marks look darker.
+    cautions:
+      - Choose non-comedogenic options when possible.
+
+  gentle_cleanser:
+    name: Gentle cleanser
+    category: routine_foundation
+    priority: supportive
+    why: Cleanses without scrubbing or stripping the skin barrier, which can help reduce irritation.
+    cautions:
+      - Avoid abrasive scrubs and harsh cleansing tools that can worsen irritation.
+
+routine_guidance:
+  mild_basic:
+    morning:
+      - Gentle cleanser
+      - Lightweight non-comedogenic moisturizer
+      - Broad-spectrum sunscreen
+    evening:
+      - Gentle cleanser
+      - One acne-focused active introduced gradually
+      - Moisturizer if skin feels dry or tight
+    general:
+      - Start with one active ingredient at a time.
+      - Avoid picking, popping, scrubbing, or frequent routine changes.
+      - Give a consistent routine several weeks before judging results.
+
+  moderate_structured:
+    morning:
+      - Gentle cleanser
+      - Benzoyl peroxide or other clinician-approved acne active if tolerated
+      - Non-comedogenic moisturizer and broad-spectrum sunscreen
+    evening:
+      - Gentle cleanser
+      - Retinoid-style ingredient introduced slowly if appropriate
+      - Barrier-supporting moisturizer
+    general:
+      - Avoid starting benzoyl peroxide, exfoliating acids, and retinoids all on the same day.
+      - Reduce frequency if dryness, burning, or peeling becomes uncomfortable.
+      - Consider professional guidance if acne is painful, worsening, or not improving.
+
+  severe_supportive:
+    morning:
+      - Gentle cleanser
+      - Barrier-supporting moisturizer
+      - Broad-spectrum sunscreen
+    evening:
+      - Gentle cleanser
+      - Avoid aggressive layering of strong actives while arranging medical evaluation
+      - Barrier-supporting moisturizer
+    general:
+      - Severe acne can scar and may need prescription treatment.
+      - Keep the routine gentle and supportive until a dermatologist can assess it.
+      - Seek care promptly if lesions are painful, deep, spreading, or leaving scars.
+
+dermatologist_escalation:
+  mild_watchful:
+    level: watchful
+    message: Mild acne may be managed with gentle over-the-counter ingredient guidance, but see a dermatologist if it persists, worsens, becomes painful, or leaves marks.
+
+  moderate_recommended:
+    level: recommended
+    message: Consider seeing a dermatologist if moderate acne is painful, worsening, affecting confidence, leaving marks, or not improving after consistent care.
+
+  severe_strong:
+    level: strongly_recommended
+    message: Severe acne should be evaluated by a dermatologist because it can be painful, may scar, and may require prescription treatment beyond ingredient guidance.
+
+severity_profiles:
+  mild:
+    ingredient_ids:
+      - gentle_cleanser
+      - salicylic_acid
+      - benzoyl_peroxide
+      - azelaic_acid
+      - niacinamide
+      - broad_spectrum_sunscreen
+    routine_guidance_id: mild_basic
+    dermatologist_escalation_id: mild_watchful
+    cautions:
+      - Do not combine multiple exfoliating or drying actives at once.
+      - Stop or reduce frequency if irritation becomes significant.
+
+  moderate:
+    ingredient_ids:
+      - gentle_cleanser
+      - benzoyl_peroxide
+      - adapalene_or_retinoid
+      - azelaic_acid
+      - barrier_support
+      - broad_spectrum_sunscreen
+    routine_guidance_id: moderate_structured
+    dermatologist_escalation_id: moderate_recommended
+    cautions:
+      - Moderate acne may need professional treatment if it does not improve.
+      - Retinoid-style ingredients can irritate skin and increase sun sensitivity.
+      - Retinoid-style ingredients should be avoided during pregnancy or when planning pregnancy unless approved by a clinician.
+
+  severe:
+    ingredient_ids:
+      - gentle_cleanser
+      - barrier_support
+      - broad_spectrum_sunscreen
+      - benzoyl_peroxide
+      - adapalene_or_retinoid
+      - azelaic_acid
+    routine_guidance_id: severe_supportive
+    dermatologist_escalation_id: severe_strong
+    cautions:
+      - Severe acne guidance is supportive only and should not delay dermatologist evaluation.
+      - Avoid harsh scrubs, picking, or aggressive active layering because irritation and scarring risk may increase.
+      - Retinoid-style ingredients can irritate skin, increase sun sensitivity, and should be avoided during pregnancy or when planning pregnancy unless approved by a clinician.

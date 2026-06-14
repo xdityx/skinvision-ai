@@ -213,6 +213,42 @@
             </div>
           </div>
 
+          <!-- Ingredient guidance -->
+          <div class="guidance-section" id="ingredient-guidance-section" hidden>
+            <div class="guidance-banner caution-banner" id="guidance-caution-banner" role="status" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div>
+                <strong>Use Carefully</strong>
+                <ul id="guidance-cautions"></ul>
+              </div>
+            </div>
+
+            <div class="guidance-banner confidence-warning-banner" id="confidence-warning-banner" role="status" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+              <p id="confidence-warning-message"></p>
+            </div>
+
+            <div class="guidance-banner dermatologist-banner" id="dermatologist-banner" role="status" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8z"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
+              <div>
+                <strong id="dermatologist-level"></strong>
+                <p id="dermatologist-message"></p>
+              </div>
+            </div>
+
+            <div class="guidance-block">
+              <h3 class="prob-title">Ingredient Guidance</h3>
+              <div class="ingredient-grid" id="ingredient-grid"></div>
+            </div>
+
+            <div class="guidance-block">
+              <h3 class="prob-title">Routine Guidance</h3>
+              <div class="routine-grid" id="routine-grid"></div>
+            </div>
+
+            <p class="guidance-disclaimer" id="guidance-disclaimer"></p>
+          </div>
+
         </div><!-- /result-content -->
 
       </section>

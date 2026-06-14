@@ -11,6 +11,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from api.recommendations.schemas import IngredientGuidance
+
 
 # ─── Responses ────────────────────────────────────────────────────────────────
 
@@ -65,6 +67,7 @@ class PredictionResponse(BaseModel):
         ..., ge=0.0, description="End-to-end prediction time in milliseconds."
     )
     model_version: str
+    ingredient_guidance: IngredientGuidance
 
 
 # ─── Error responses ──────────────────────────────────────────────────────────
