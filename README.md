@@ -1,16 +1,16 @@
-# SkinVision AI - Acne Severity Analysis
+# SkinVision AI - Acne Severity Analysis + Ingredient Guidance
 
-SkinVision AI is an end-to-end computer vision MVP for classifying acne severity from face or acne-region images into three ordinal classes: **mild**, **moderate**, and **severe**.
+SkinVision AI is an end-to-end computer vision MVP that analyzes a face or acne-region image, predicts acne severity as **mild**, **moderate**, or **severe**, and returns educational ingredient guidance based on that severity.
 
-The project covers dataset auditing, leakage-aware splitting, model training, CLI inference, a FastAPI backend, and a plain HTML/CSS/JS frontend demo. It is designed as a research and portfolio project, not as a clinical product.
+The project covers dataset auditing, leakage-aware splitting, ordinal model training, CLI inference, a FastAPI backend, a plain HTML/CSS/JS frontend demo, and a rule-based acne ingredient recommendation engine. It is designed as a research and portfolio project, not as a clinical product.
 
-> **Medical disclaimer:** This is not a medical diagnosis. This tool is for educational and research purposes only and should not be used as a substitute for professional medical advice, diagnosis, or treatment.
+> **Medical disclaimer:** This is not a medical diagnosis, prescription, or substitute for professional medical advice. Ingredient guidance is educational only. Severe, painful, worsening, or scarring acne should be evaluated by a qualified dermatologist.
 
 ---
 
 ## Current Status
 
-MVP v1.0 is complete and working.
+MVP acne severity detection and Phase 3 ingredient guidance are complete and working.
 
 | Phase | Status | Output |
 |---|---:|---|
@@ -19,9 +19,10 @@ MVP v1.0 is complete and working.
 | Phase 2B | Complete | CLI inference workflow |
 | Phase 2C | Complete | FastAPI prediction API |
 | Phase 2D | Complete | Browser frontend demo |
+| Phase 3 | Complete | Rule-based acne ingredient guidance engine |
 | Cleanup | Complete | Dataset and model artifacts excluded from Git history/tracking |
 
-API test status: **36 passed**.
+API test status: **46 passed**.
 
 ---
 
@@ -31,19 +32,26 @@ Acne severity is naturally ordinal: severe acne is not just a different category
 
 The dataset also contains many partial-face crops, such as cheek, forehead, side-face, and lower-face images. The API therefore supports relaxed face validation by default so valid acne-region crops are not rejected just because a full face is not detected.
 
+After severity prediction, Phase 3 adds a rule-based guidance layer that maps the predicted severity to acne-related ingredients, routine guidance, cautions, and dermatologist escalation messaging. It does not recommend product names and does not scrape ecommerce sites.
+
 ---
 
 ## Key Features
 
-- Three-class acne severity prediction: `mild`, `moderate`, `severe`
+- Acne severity classification: `mild`, `moderate`, `severe`
+- Confidence score and class probabilities
 - EfficientNet-B2 backbone with an ordinal CORN head
-- FastAPI backend with readiness and prediction endpoints
-- Plain HTML/CSS/JS frontend demo
 - Optional 5-view test-time augmentation (TTA)
 - Configurable face validation:
   - `strict_face=false` by default
   - partial-face ACNE04 crops are allowed with a warning
   - `strict_face=true` rejects no-face and multiple-face inputs
+- FastAPI backend with readiness and prediction endpoints
+- Plain HTML/CSS/JS frontend demo
+- Rule-based ingredient guidance from a versioned YAML knowledge base
+- Routine guidance by severity
+- Cautions for irritation, sun sensitivity, pregnancy risk, and over-layering actives
+- Dermatologist escalation messaging, especially for severe acne
 - Dataset and model artifact safety:
   - raw dataset files are not committed
   - model weights are not committed
@@ -51,15 +59,20 @@ The dataset also contains many partial-face crops, such as cheek, forehead, side
 
 ---
 
-## Demo Screenshots
+## Prediction Flow
 
-Screenshots are intentionally stored outside the tracked dataset/model folders.
-
-![Upload screen placeholder](docs/images/demo-upload.png)
-
-![Prediction result placeholder](docs/images/demo-result.png)
-
-![Swagger API placeholder](docs/images/api-swagger.png)
+```text
+Image upload
+  -> upload validation
+  -> configurable face validation
+  -> acne severity prediction: mild / moderate / severe
+  -> confidence + class probabilities
+  -> face validation warning if needed
+  -> ingredient guidance based on severity
+  -> routine guidance, cautions, and dermatologist escalation
+  -> JSON response
+  -> frontend result view
+```
 
 ---
 
@@ -81,20 +94,21 @@ Phase 2B: CLI inference
 Phase 2C: FastAPI API
         |
         v
-Phase 2D: HTML/CSS/JS frontend demo
+Phase 3: rule-based recommendation engine + YAML knowledge base
+        |
+        v
+Phase 2D/3 UI: HTML/CSS/JS frontend demo with ingredient guidance
 ```
 
-Main runtime flow:
+Runtime components:
 
 ```text
-User image
-  -> FastAPI upload validation
-  -> MediaPipe face status check
-  -> relaxed or strict face validation
+FastAPI /api/v1/predict
   -> AcnePredictor inference
-  -> severity probabilities
-  -> JSON response
-  -> frontend result view
+  -> prediction response model
+  -> recommendation engine
+  -> api/recommendations/kb/acne_ingredients.v1.yaml
+  -> ingredient_guidance response block
 ```
 
 ---
@@ -103,40 +117,47 @@ User image
 
 ```text
 FaceRecogintion/
-  api/                         FastAPI backend
-    main.py                    App factory and lifespan
-    config.py                  API settings
-    face_validator.py          MediaPipe face detection wrapper
-    models.py                  Pydantic response schemas
+  api/                                  FastAPI backend
+    main.py                             App factory and lifespan
+    config.py                           API settings
+    face_validator.py                   MediaPipe face detection wrapper
+    models.py                           Pydantic response schemas
     routers/
-      health.py                GET /health, GET /ready
-      predict.py               POST /api/v1/predict
-    tests/                     API tests
+      health.py                         GET /health, GET /ready
+      predict.py                        POST /api/v1/predict
+    recommendations/
+      engine.py                         Rule-based guidance builder
+      loader.py                         YAML loading and validation
+      schemas.py                        Pydantic guidance schemas
+      kb/
+        acne_ingredients.v1.yaml        Versioned ingredient knowledge base
+    tests/                              API and recommendation tests
 
-  frontend/                    Plain HTML/CSS/JS demo
+  frontend/                             Plain HTML/CSS/JS demo
     index.html
     style.css
     app.js
 
-  phase0/                      Dataset audit and split pipeline
+  phase0/                               Dataset audit and split pipeline
     config/phase0.yaml
     src/
     tests/
 
-  phase1/                      Model training and inference code
+  phase1/                               Model training and inference code
     config/phase1.yaml
     scripts/
     src/
-      model.py                 EfficientNet-B2 + CORN model
+      model.py                          EfficientNet-B2 + CORN model
       dataset.py
       transforms.py
       trainer.py
       metrics.py
-      inference.py             AcnePredictor and TTA inference
+      inference.py                      AcnePredictor and TTA inference
     tests/
 
-  reports/                     Final reports and lightweight docs
+  reports/                              Final reports and lightweight docs
   pyproject.toml
+  README.md
 ```
 
 Local-only paths such as `data/raw/`, `phase1/checkpoints/`, and `phase1/logs/` are intentionally ignored.
@@ -195,6 +216,8 @@ This does not prove the model generalizes clinically; it simply reduces one comm
 | Optional inference mode | 5-view TTA |
 | Backend serving | FastAPI |
 | Frontend | Plain HTML/CSS/JS |
+| Recommendation engine | Rule-based YAML knowledge base |
+| Knowledge base | `api/recommendations/kb/acne_ingredients.v1.yaml` |
 
 CORN is used because acne severity has an ordered label structure. The model predicts severity while preserving the mild-to-moderate-to-severe relationship more directly than a flat multi-class objective.
 
@@ -212,6 +235,33 @@ CORN is used because acne severity has an ordered label structure. The model pre
 | Severe accuracy | 74.5% |
 
 The moderate class remains the hardest class, which is expected in an ordinal severity task where boundary cases can be visually ambiguous.
+
+---
+
+## Phase 3: Ingredient Guidance
+
+Phase 3 adds a deterministic, rule-based guidance layer after model inference. The acne model still only predicts severity; the recommendation engine maps that severity to educational ingredient guidance.
+
+The engine returns:
+
+- recommended ingredients
+- why each ingredient may be useful
+- ingredient-specific cautions
+- routine guidance
+- general cautions
+- dermatologist escalation messaging
+- low-confidence warning when model confidence is below `0.60`
+
+Design constraints:
+
+- No product recommendations
+- No ecommerce scraping
+- No user accounts
+- No model retraining
+- No changes to CORN/model inference logic
+- Educational guidance only
+
+Severe acne guidance intentionally emphasizes dermatologist evaluation because severe acne can be painful, may scar, and may require prescription treatment.
 
 ---
 
@@ -247,7 +297,7 @@ Example response:
 
 ### `POST /api/v1/predict`
 
-Predict acne severity for one uploaded image.
+Predict acne severity for one uploaded image and return severity-based ingredient guidance.
 
 Query parameters:
 
@@ -285,8 +335,62 @@ Example response:
   "tta_views": null,
   "face_detected": true,
   "face_warning": null,
-  "inference_time_ms": 560.69,
-  "model_version": "acne-classifier-v1.0"
+  "inference_time_ms": 316.12,
+  "model_version": "acne-classifier-v1.0",
+  "ingredient_guidance": {
+    "schema_version": "acne_ingredients.v1",
+    "severity": "mild",
+    "disclaimer": "Educational ingredient guidance only. This is not a diagnosis, prescription, or substitute for care from a qualified dermatologist.",
+    "recommended_ingredients": [
+      {
+        "id": "gentle_cleanser",
+        "name": "Gentle cleanser",
+        "category": "routine_foundation",
+        "priority": "supportive",
+        "why": "Cleanses without scrubbing or stripping the skin barrier, which can help reduce irritation.",
+        "cautions": [
+          "Avoid abrasive scrubs and harsh cleansing tools that can worsen irritation."
+        ]
+      },
+      {
+        "id": "salicylic_acid",
+        "name": "Salicylic acid",
+        "category": "exfoliating_acid",
+        "priority": "core",
+        "why": "Helps loosen dead skin cells and oil inside pores, which may support blackhead, whitehead, and clogged-pore care.",
+        "cautions": [
+          "Can cause dryness, stinging, peeling, or irritation, especially when combined with other exfoliating ingredients.",
+          "Introduce gradually and pause if significant irritation occurs."
+        ]
+      }
+    ],
+    "routine_guidance": {
+      "morning": [
+        "Gentle cleanser",
+        "Lightweight non-comedogenic moisturizer",
+        "Broad-spectrum sunscreen"
+      ],
+      "evening": [
+        "Gentle cleanser",
+        "One acne-focused active introduced gradually",
+        "Moisturizer if skin feels dry or tight"
+      ],
+      "general": [
+        "Start with one active ingredient at a time.",
+        "Avoid picking, popping, scrubbing, or frequent routine changes.",
+        "Give a consistent routine several weeks before judging results."
+      ]
+    },
+    "cautions": [
+      "Do not combine multiple exfoliating or drying actives at once.",
+      "Stop or reduce frequency if irritation becomes significant."
+    ],
+    "dermatologist_escalation": {
+      "level": "watchful",
+      "message": "Mild acne may be managed with gentle over-the-counter ingredient guidance, but see a dermatologist if it persists, worsens, becomes painful, or leaves marks."
+    },
+    "confidence_warning": null
+  }
 }
 ```
 
@@ -304,6 +408,28 @@ Common error codes:
 
 ---
 
+## Frontend Demo
+
+The frontend is a plain HTML/CSS/JS demo that uploads an image to the FastAPI backend and renders the complete prediction response.
+
+Current UI support:
+
+- image upload with preview
+- optional TTA toggle
+- severity badge
+- confidence score
+- class probability bars
+- face validation warning banner
+- ingredient cards
+- caution banner
+- dermatologist escalation banner
+- routine guidance section
+- model metadata
+
+The frontend sends `strict_face=false` by default, so partial ACNE04-style acne crops can still be analyzed. If the API reports a face validation concern, the frontend displays it as a warning banner instead of blocking the result.
+
+---
+
 ## Local Setup
 
 Create and activate a virtual environment:
@@ -317,7 +443,7 @@ Install dependencies:
 
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-pip install timm albumentations fastapi uvicorn python-multipart pydantic-settings mediapipe pillow opencv-python tqdm pytest
+pip install timm albumentations fastapi uvicorn python-multipart pydantic-settings mediapipe pillow opencv-python tqdm pytest pyyaml
 ```
 
 For CPU-only environments, install the appropriate PyTorch build from the official PyTorch installation instructions, then install the remaining dependencies.
@@ -374,8 +500,6 @@ Then open:
 http://localhost:3000
 ```
 
-The frontend sends `strict_face=false` by default, so partial ACNE04-style acne crops can still be analyzed. If the API reports a face validation concern, the frontend displays it as a yellow warning banner instead of blocking the result.
-
 ---
 
 ## Sample Curl Request
@@ -416,7 +540,7 @@ python -m pytest api/tests/ -v
 Current API test result:
 
 ```text
-36 passed
+46 passed
 ```
 
 Other test suites:
@@ -447,6 +571,11 @@ API settings can be overridden with environment variables using the `ACNE_` pref
 ## Limitations
 
 - This is not a medical diagnosis.
+- This is not a prescription or treatment plan.
+- Ingredient guidance is educational and rule-based, not personalized medical advice.
+- The system does not collect medical history, medication use, allergies, pregnancy status, skin sensitivity, age, or prior treatment response.
+- The system does not detect allergy risk, pregnancy compatibility, or individual sensitivity from an image.
+- Severe, painful, worsening, or scarring acne should be evaluated by a dermatologist.
 - The model is not medically approved and is not ready for clinical deployment.
 - Performance is measured on the project test split, not on prospective clinical data.
 - ACNE04 images can differ from real-world smartphone, lighting, demographic, and skin-tone distributions.
@@ -456,16 +585,31 @@ API settings can be overridden with environment variables using the `ACNE_` pref
 
 ---
 
-## Future Roadmap
+## Roadmap
 
-- Add saved demo screenshots under `docs/images/`
-- Add model card with dataset, evaluation, and ethical considerations
-- Add more detailed error analysis by class and image type
-- Evaluate on additional public or consented acne datasets
-- Improve calibration and uncertainty reporting
-- Add batch inference for local research workflows
-- Add lightweight Docker setup for reproducible API runs
-- Add CI checks for API tests and artifact safety
+Completed:
+
+- MVP acne severity detection
+- CLI inference
+- FastAPI backend
+- Plain HTML/CSS/JS frontend demo
+- Rule-based ingredient guidance
+
+Next:
+
+- Screenshots and documentation polish
+- Hyperpigmentation and dark spot detection
+- Multi-concern analysis
+- Model card with dataset, evaluation, and ethical considerations
+- CI checks for API tests and artifact safety
+
+Later:
+
+- Product recommendation based on ingredients
+- Progress tracking
+- Calibration and uncertainty improvements
+- Batch inference for local research workflows
+- Lightweight Docker setup for reproducible API runs
 
 ---
 
